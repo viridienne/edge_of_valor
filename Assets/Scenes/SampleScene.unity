@@ -918,13 +918,13 @@ MonoBehaviour:
   jumpForce: 600
   groundDistance: 0.1
   controlAnimator: {fileID: 1485192368}
-  rb: {fileID: 0}
-  somersaultForce: 600
-  somersaultTime: 0.15
-  somersaultLimit: 2
-  attack1Time: 0.5
-  attack2Time: 0.5
-  attack3Time: 0.5
+  rb: {fileID: 1485192369}
+  somersaultForce: 450
+  somersaultTime: 0.1
+  somersaultLimit: 1
+  attackDelay: 0.45
+  attackDelay2: 0.7
+  attackDelay3: 0.7
 --- !u!95 &1485192367
 Animator:
   serializedVersion: 5

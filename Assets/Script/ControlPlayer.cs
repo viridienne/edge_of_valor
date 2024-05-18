@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -12,7 +9,8 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private float groundDistance = 0.2f;
     [SerializeField] private ControlAnimator controlAnimator;
     [SerializeField] private Rigidbody2D rb;
-    
+
+    private float speed;
     private Transform tf;
     private Vector2 moveInput;
     private float groundY;
@@ -22,7 +20,8 @@ public class ControlPlayer : MonoBehaviour
         tf = transform;
         rb = GetComponent<Rigidbody2D>();
         GetSpriteRenderer();
-        currentAttack = 1;
+        currentAttack = 0;
+        speed = moveSpeed;
         ReceiveInput.Instance.JumpInput += Jump;
         ReceiveInput.Instance.LightAttackInput += LightAttack;
         ReceiveInput.Instance.HeavyAttackInput += HeavyAttack;
@@ -39,15 +38,30 @@ public class ControlPlayer : MonoBehaviour
     {
         moveInput = ReceiveInput.Instance.MoveInput;
         IsGrounded();
-        Move();
-        Flip();
-        HandleAnimation();
-        if (attackTime > Time.time)
+        
+        if(attackReset < 0)
         {
-            currentAttack = 1;
+            Move();
+            Flip();
+            HandleAnimation();
         }
+
+        Countdown();
     }
 
+    public void Countdown()
+    {
+        if (attackReset >= 0)
+        {
+            attackReset -= Time.deltaTime;
+        }
+        else
+        {
+            speed = moveSpeed;
+            PlayAttack(ActionAnim.CancelAttack);
+        }
+    }
+    
     [SerializeField] private float somersaultForce = 5f;
     [SerializeField] private float somersaultTime = 0.5f;
     [SerializeField] private float somersaultLimit = 1f;
@@ -55,8 +69,8 @@ public class ControlPlayer : MonoBehaviour
     private bool hasJumped;
     public void Jump()
     {
-        IsGrounded();
-
+        if (attackReset >= 0) return;
+        
         if (isGrounded)
         {
             PlayAction(ActionAnim.OnAir);
@@ -84,7 +98,7 @@ public class ControlPlayer : MonoBehaviour
         var _current = tf.position;
         var _target = _current + new Vector3(moveInput.x, 0, 0);
         
-        var _pos = Vector2.Lerp(_current, _target, moveSpeed * Time.deltaTime);
+        var _pos = Vector2.Lerp(_current, _target, speed * Time.deltaTime);
         tf.position = _pos;
     }
 
@@ -99,44 +113,54 @@ public class ControlPlayer : MonoBehaviour
     }
     
     private int currentAttack;
-    private float attackTime;
-    [SerializeField] private float attack1Time = 0.5f;
-    [SerializeField] private float attack2Time = 0.5f;
-    [SerializeField] private float attack3Time = 0.5f;
+    private float attackReset;
+    [SerializeField] private float attackDelay;
+    [SerializeField] private float attackDelay2;
+    [SerializeField] private float attackDelay3;
+    
     public void LightAttack()
     {
-        if (Time.time < attackTime) return;
-        
-        float _time = 0;
-        switch (currentAttack)
+        speed = 0;
+        var _delay = currentAttack switch
         {
-            case 1:
-                PlayAction(ActionAnim.Attack_01);
-                _time = attack1Time;
-                break;
-            case 2:
-                PlayAction(ActionAnim.Attack_02);
-                _time = attack2Time;
-                break;
-            case 3:
-                return;
-        }
-
-        attackTime = Time.time + _time;
-        currentAttack++;
-    }
-    
-    public void HeavyAttack()
-    {
-        if(currentAttack <2) return;
-        if (Time.time < attackTime) return;
+            3 => attackDelay3,
+            1 => attackDelay,
+            2 => attackDelay2,
+            _ => attackDelay
+        };
         
-        PlayAction(ActionAnim.Attack_03);
-        attackTime = Time.time + attack3Time;
-        if (currentAttack >= 3)
+        if (attackReset > 0)
+        {
+            currentAttack++;
+            if (currentAttack > 3)
+            {
+                currentAttack = 1;
+            }
+        }
+        else
         {
             currentAttack = 1;
         }
+
+        attackReset = Time.deltaTime + _delay;
+        PlayAttack(ActionAnim.LightAttack);
+    }
+
+    public void PlayAttack(ActionAnim _attack)
+    {
+        switch (_attack)
+        {
+            case ActionAnim.LightAttack:
+                PlayAction(ActionAnim.LightAttack);
+                break;
+            case 0:
+                PlayAction(ActionAnim.CancelAttack);
+                break;
+        }
+    }
+    public void HeavyAttack()
+    {
+
     }
     
     private void IsGrounded()
