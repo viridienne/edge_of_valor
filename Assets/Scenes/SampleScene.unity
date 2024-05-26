@@ -921,10 +921,10 @@ MonoBehaviour:
   rb: {fileID: 1485192369}
   somersaultForce: 450
   somersaultTime: 0.1
-  somersaultLimit: 1
-  attackDelay: 0.45
-  attackDelay2: 0.7
-  attackDelay3: 0.7
+  somersaultLimit: 0.5
+  attackDelay: 0.15
+  attackDelay2: 0.3
+  attackDelay3: 0.5
 --- !u!95 &1485192367
 Animator:
   serializedVersion: 5
@@ -1019,7 +1019,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0.5}
-  m_Size: {x: 0.75, y: 1.14}
+  m_Size: {x: 0.75, y: 1.02}
   m_Direction: 0
 --- !u!1 &1526884861
 GameObject:

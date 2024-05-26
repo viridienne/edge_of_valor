@@ -1,3 +1,4 @@
+using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -37,16 +38,19 @@ public class ControlPlayer : MonoBehaviour
     private void Update()
     {
         moveInput = ReceiveInput.Instance.MoveInput;
-        IsGrounded();
-        
-        if(attackReset < 0)
+        Countdown();
+
+        if(Time.time - lastAttack > 0.5f)
         {
             Move();
             Flip();
             HandleAnimation();
         }
+    }
 
-        Countdown();
+    private void FixedUpdate()
+    {
+        IsGrounded();
     }
 
     public void Countdown()
@@ -57,6 +61,7 @@ public class ControlPlayer : MonoBehaviour
         }
         else
         {
+            currentAttack = 0;
             speed = moveSpeed;
             PlayAttack(ActionAnim.CancelAttack);
         }
@@ -66,29 +71,28 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private float somersaultTime = 0.5f;
     [SerializeField] private float somersaultLimit = 1f;
     private float jumpTime;
-    private bool hasJumped;
     public void Jump()
     {
         if (attackReset >= 0) return;
-        
-        if (isGrounded)
+
+        if (isGrounded && Time.time - jumpTime > 0)
         {
             PlayAction(ActionAnim.OnAir);
             PlayAction(ActionAnim.Jump);
             rb.AddForce((Vector2)tf.up * jumpForce);
             jumpTime = Time.time + somersaultTime;
-            hasJumped = true;
-            isGrounded = false;
         }
         else
         {
+            if (isGrounded) return;
+            
             if (Time.time - jumpTime > 0)
             {
+                //if rigidbody is falling, return
+                if (rb.velocity.y < 0) return;
                 rb.AddForce((Vector2)tf.up * somersaultForce);
                 PlayAction(ActionAnim.Somersault);
                 jumpTime = Time.time + somersaultLimit;
-                hasJumped = true;
-                isGrounded = false;
             }
         }
     }
@@ -114,6 +118,7 @@ public class ControlPlayer : MonoBehaviour
     
     private int currentAttack;
     private float attackReset;
+    private float lastAttack;
     [SerializeField] private float attackDelay;
     [SerializeField] private float attackDelay2;
     [SerializeField] private float attackDelay3;
@@ -121,6 +126,8 @@ public class ControlPlayer : MonoBehaviour
     public void LightAttack()
     {
         speed = 0;
+        moveInput = Vector2.zero;
+        
         var _delay = currentAttack switch
         {
             3 => attackDelay3,
@@ -142,16 +149,17 @@ public class ControlPlayer : MonoBehaviour
             currentAttack = 1;
         }
 
+        lastAttack = Time.time;
         attackReset = Time.deltaTime + _delay;
-        PlayAttack(ActionAnim.LightAttack);
+        PlayAttack(ActionAnim.Attack);
     }
 
     public void PlayAttack(ActionAnim _attack)
     {
         switch (_attack)
         {
-            case ActionAnim.LightAttack:
-                PlayAction(ActionAnim.LightAttack);
+            case ActionAnim.Attack:
+                PlayAction(ActionAnim.Attack);
                 break;
             case 0:
                 PlayAction(ActionAnim.CancelAttack);
@@ -170,7 +178,7 @@ public class ControlPlayer : MonoBehaviour
 
     private void HandleAnimation()
     {
-        if (!isGrounded)
+        if (!isGrounded || currentAttack > 0)
         {
             return;
         }

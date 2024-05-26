@@ -11,7 +11,7 @@ public enum ActionAnim
     Somersault,
     Fall,
     OnAir,
-    LightAttack,
+    Attack,
     CancelAttack
 }
 public class ControlAnimator : MonoBehaviour
@@ -22,14 +22,12 @@ public class ControlAnimator : MonoBehaviour
     private const string JUMP = "Jump";
     private const string SOMERSAULT = "Somersault";
     private const string FALL = "Fall";
-    private const string ATK = "Atk";
     private const string ATTACK = "Attack";
     private int COMBAT_RUN_HASH => Animator.StringToHash(COMBAT_RUN);
     private int COMBAT_IDLE_HASH => Animator.StringToHash(COMBAT_IDLE);
     private int JUMP_HASH => Animator.StringToHash(JUMP);
     private int SOMERSAULT_HASH => Animator.StringToHash(SOMERSAULT);
     private int FALL_HASH => Animator.StringToHash(FALL);
-    private int ATK_HASH => Animator.StringToHash(ATK);
     private int ATTACK_HASH => Animator.StringToHash(ATTACK);
     
     [Button]
@@ -62,7 +60,7 @@ public class ControlAnimator : MonoBehaviour
             case ActionAnim.Fall:
                 animator.SetTrigger(FALL_HASH);
                 break;
-            case ActionAnim.LightAttack:
+            case ActionAnim.Attack:
                 animator.SetBool(COMBAT_RUN_HASH,false);
                 animator.SetBool(COMBAT_IDLE_HASH, false);
                 animator.SetTrigger(ATTACK_HASH);
