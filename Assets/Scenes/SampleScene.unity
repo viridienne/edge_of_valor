@@ -823,10 +823,10 @@ GameObject:
   - component: {fileID: 1485192365}
   - component: {fileID: 1485192364}
   - component: {fileID: 1485192366}
-  - component: {fileID: 1485192368}
   - component: {fileID: 1485192367}
   - component: {fileID: 1485192369}
   - component: {fileID: 1485192370}
+  - component: {fileID: 1485192371}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -917,14 +917,19 @@ MonoBehaviour:
   moveSpeed: 5
   jumpForce: 600
   groundDistance: 0.1
-  controlAnimator: {fileID: 1485192368}
+  controlAnimator: {fileID: 1485192371}
   rb: {fileID: 1485192369}
   somersaultForce: 450
   somersaultTime: 0.1
   somersaultLimit: 0.5
-  attackDelay: 0.15
-  attackDelay2: 0.3
+  attackCompletionTime: 0
+  attackMaxInterval: 0.2
+  attackDelay: 0.5
+  attackDelay2: 0.5
   attackDelay3: 0.5
+  fadeAttack1: 0.15
+  fadeAttack2: 0.15
+  fadeAttack3: 0.15
 --- !u!95 &1485192367
 Animator:
   serializedVersion: 5
@@ -935,7 +940,7 @@ Animator:
   m_GameObject: {fileID: 1485192363}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 0c37ac97c996e3e42a57ca326d049272, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1caf92553c3021044a0c1161e604fc56, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -946,19 +951,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &1485192368
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1485192363}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64146218204f0b242b2cd2fe5e7ddb77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 1485192367}
 --- !u!50 &1485192369
 Rigidbody2D:
   serializedVersion: 4
@@ -1021,6 +1013,18 @@ CapsuleCollider2D:
   m_Offset: {x: 0, y: 0.5}
   m_Size: {x: 0.75, y: 1.02}
   m_Direction: 0
+--- !u!114 &1485192371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485192363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce26cffd8ec94084a8181ca589a27bbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1526884861
 GameObject:
   m_ObjectHideFlags: 0

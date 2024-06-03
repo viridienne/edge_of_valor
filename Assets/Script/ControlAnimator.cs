@@ -12,6 +12,9 @@ public enum ActionAnim
     Fall,
     OnAir,
     Attack,
+    Attack1,
+    Attack2,
+    Attack3,
     CancelAttack
 }
 public class ControlAnimator : MonoBehaviour
