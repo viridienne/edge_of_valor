@@ -916,7 +916,8 @@ MonoBehaviour:
   spriteRenderer: {fileID: 1485192364}
   moveSpeed: 5
   jumpForce: 600
-  groundDistance: 0.1
+  atkJumpForce: 225
+  groundDistance: 0.05
   controlAnimator: {fileID: 1485192371}
   rb: {fileID: 1485192369}
   somersaultForce: 450
@@ -930,6 +931,12 @@ MonoBehaviour:
   fadeAttack1: 0.15
   fadeAttack2: 0.15
   fadeAttack3: 0.15
+  airAttackDelay: 0.3
+  airAttackDelay2: 0.3
+  airAttackDelay3: 0.75
+  airFadeAttack1: 0.15
+  airFadeAttack2: 0.15
+  airFadeAttack3: 0.15
 --- !u!95 &1485192367
 Animator:
   serializedVersion: 5

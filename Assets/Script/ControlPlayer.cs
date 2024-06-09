@@ -7,6 +7,7 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private SpriteRenderer spriteRenderer;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float jumpForce = 5f;
+    [SerializeField] private float atkJumpForce = 5f;
     [SerializeField] private float groundDistance = 0.2f;
     [SerializeField] private ControlAnimatorV2 controlAnimator;
     [SerializeField] private Rigidbody2D rb;
@@ -33,6 +34,11 @@ public class ControlPlayer : MonoBehaviour
         ReceiveInput.Instance.JumpInput -= Jump;
         ReceiveInput.Instance.LightAttackInput -= LightAttack;
         ReceiveInput.Instance.HeavyAttackInput -= HeavyAttack;
+    }
+
+    private void FixedUpdate()
+    {
+        IsGrounded();
     }
 
     private void Update()
@@ -72,19 +78,27 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private float somersaultTime = 0.5f;
     [SerializeField] private float somersaultLimit = 1f;
     private float jumpTime;
+    private bool jumped;
+    private bool isInAtk3;
     public void Jump()
     {
         if (attackReset >= 0) return;
 
-        if (IsGrounded() && Time.time - jumpTime > 0)
+        if (isGrounded && Time.time - jumpTime > 0)
         {
             rb.AddForce((Vector2)tf.up * jumpForce);
             jumpTime = Time.time + somersaultTime;
             PlayAction(ActionAnim.Jump);
+            
+            //reset attack
+            currentAttack = -1;
+            attackReset = 0;
+            attackCompletionTime = 0;
+            jumped = true;
         }
         else
         {
-            if (IsGrounded()) return;
+            if (isGrounded) return;
             
             if (Time.time - jumpTime > 0)
             {
@@ -93,6 +107,7 @@ public class ControlPlayer : MonoBehaviour
                 rb.AddForce((Vector2)tf.up * somersaultForce);
                 jumpTime = Time.time + somersaultLimit;
                 PlayAction(ActionAnim.Somersault);
+                jumped = true;
             }
         }
     }
@@ -118,10 +133,11 @@ public class ControlPlayer : MonoBehaviour
     
     private int currentAttack;
     private float attackReset;
-    private float lastAttack;
     [InfoBox("attackCompletionTime = attackReset - attackMaxInterval \n attackReset = Time.deltaTime + attackDelay \n attackDelay = attackDelay2 = attackDelay3")]
     [SerializeField] private float attackCompletionTime;
     [SerializeField] private float attackMaxInterval;
+    
+    [Title("Ground Attack")]
     [SerializeField] private float attackDelay;
     [SerializeField] private float attackDelay2;
     [SerializeField] private float attackDelay3;
@@ -130,35 +146,76 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private float fadeAttack2;
     [SerializeField] private float fadeAttack3;
     
+    [Title("Air Attack")]
+    [SerializeField] private float airAttackDelay;
+    [SerializeField] private float airAttackDelay2;
+    [SerializeField] private float airAttackDelay3;
+    [SerializeField] private float airFadeAttack1;
+    [SerializeField] private float airFadeAttack2;
+    [SerializeField] private float airFadeAttack3;
+    
     public void LightAttack()
     {
-        if (IsGrounded())
+        if (isGrounded)
         {
             PlayGroundAttack();
         }
-    }
-    
-    public void StopGroundAttack()
-    {
-        speed = moveSpeed;
-        currentAttack = -1;
-
-        if (IsGrounded())
+        else
         {
-            if (moveInput.x > 0 || moveInput.x < 0)
-            {
-                PlayAction(ActionAnim.Run);
-            }
-            else
-            {
-                PlayAction(ActionAnim.Idle);
-            }
+            PlayAirAttack();
+        }
+    }
+    public void PlayAirAttack()
+    {
+        if (attackCompletionTime > 0) return;
+        
+        speed = 0;
+        moveInput = Vector2.zero;
+        
+        if (attackReset > 0)
+        {
+            currentAttack++;
         }
         else
         {
-                    
+            currentAttack = 1;
+        }
+
+        var _delay = currentAttack switch
+        {
+            3 => airAttackDelay3,
+            1 => airAttackDelay,
+            2 => airAttackDelay2,
+            _ => attackDelay
+        };
+        
+        if (currentAttack > 0)
+        {
+            attackReset = Time.deltaTime + _delay;
+            attackCompletionTime = attackReset - attackMaxInterval;
+            rb.AddForce((Vector2)tf.up * atkJumpForce);
+        }
+
+        switch (currentAttack)
+        {
+            case 1:
+                PlayAction(ActionAnim.AirAttack1, airFadeAttack1);
+                break;
+            case 2:
+                PlayAction(ActionAnim.AirAttack2, airAttackDelay2);
+                break;
+            case 3:
+                PlayAction(ActionAnim.AirAttack3, airFadeAttack3);
+                isInAtk3 = true;
+                break;
+        }
+        
+        if (currentAttack >= 3)
+        {
+            currentAttack = 0;
         }
     }
+    
     public void PlayGroundAttack()
     {
         if(attackCompletionTime > 0) return;
@@ -185,7 +242,6 @@ public class ControlPlayer : MonoBehaviour
         
         if (currentAttack > 0)
         {
-            lastAttack = Time.time;
             attackReset = Time.deltaTime + _delay;
             attackCompletionTime = attackReset - attackMaxInterval;
         }
@@ -208,20 +264,61 @@ public class ControlPlayer : MonoBehaviour
             currentAttack = 0;
         }
     }
+    
+    public void StopGroundAttack()
+    {
+        speed = moveSpeed;
+        currentAttack = -1;
+
+        if (isGrounded)
+        {
+            if (moveInput.x > 0 || moveInput.x < 0)
+            {
+                PlayAction(ActionAnim.Run);
+            }
+            else
+            {
+                PlayAction(ActionAnim.Idle);
+            }
+        }
+        else
+        {
+                    
+        }
+    }
+
     public void HeavyAttack()
     {
 
     }
     
-    private bool IsGrounded()
+    private bool isGrounded;
+    private void IsGrounded()
     {
-        var _isGrounded = Physics2D.Raycast(tf.position, -tf.up,groundDistance, 1 << LayerMask.NameToLayer("Ground"));
-        return _isGrounded;
+        isGrounded  = Physics2D.Raycast(tf.position, -tf.up,groundDistance, 1 << LayerMask.NameToLayer("Ground"));
+        Debug.LogError("landed -> " + isGrounded);
+        if (jumped && isGrounded)
+        {
+            if (isInAtk3)
+            {
+                Debug.LogError("isInAtk3 -> " + isGrounded);
+                PlayAction(ActionAnim.AirAttack3_End,fadeAttack3);
+            }
+            else
+            {
+                attackReset = 0;
+                attackCompletionTime = 0;
+            }
+            
+            currentAttack = -1;
+            jumped = false;
+            isInAtk3 = false;
+        }
     }
 
     private void HandleAnimation()
     {
-        if (!IsGrounded() || currentAttack > 0 || Time.time - jumpTime < 0)
+        if (!isGrounded || currentAttack > 0 || Time.time - jumpTime < 0)
         {
             return;
         }

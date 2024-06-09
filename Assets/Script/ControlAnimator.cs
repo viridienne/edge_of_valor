@@ -1,22 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
-public enum ActionAnim
-{
-    Idle,
-    Walk,
-    Run,
-    Jump,
-    Somersault,
-    Fall,
-    OnAir,
-    Attack,
-    Attack1,
-    Attack2,
-    Attack3,
-    CancelAttack
-}
+
 public class ControlAnimator : MonoBehaviour
 {
     [SerializeField] private Animator animator;
