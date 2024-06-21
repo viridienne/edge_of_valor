@@ -52,6 +52,7 @@ public class ControlPlayer : MonoBehaviour
             Flip();
             HandleAnimation();
         }
+        // Debug.Log("velocity -> " + rb.velocity);
     }
 
     public void Countdown()
@@ -80,6 +81,7 @@ public class ControlPlayer : MonoBehaviour
     private float jumpTime;
     private bool jumped;
     private bool isInAtk3;
+    private bool somersaulted;
     public void Jump()
     {
         if (attackReset >= 0) return;
@@ -108,6 +110,7 @@ public class ControlPlayer : MonoBehaviour
                 jumpTime = Time.time + somersaultLimit;
                 PlayAction(ActionAnim.Somersault);
                 jumped = true;
+                somersaulted = true;
             }
         }
     }
@@ -175,6 +178,13 @@ public class ControlPlayer : MonoBehaviour
         if (attackReset > 0)
         {
             currentAttack++;
+            if (currentAttack >= 2)
+            {
+                if (!somersaulted)
+                {
+                    return;
+                }
+            }
         }
         else
         {
@@ -202,7 +212,7 @@ public class ControlPlayer : MonoBehaviour
                 PlayAction(ActionAnim.AirAttack1, airFadeAttack1);
                 break;
             case 2:
-                PlayAction(ActionAnim.AirAttack2, airAttackDelay2);
+                PlayAction(ActionAnim.AirAttack2, airFadeAttack2);
                 break;
             case 3:
                 PlayAction(ActionAnim.AirAttack3, airFadeAttack3);
@@ -281,10 +291,6 @@ public class ControlPlayer : MonoBehaviour
                 PlayAction(ActionAnim.Idle);
             }
         }
-        else
-        {
-                    
-        }
     }
 
     public void HeavyAttack()
@@ -296,23 +302,23 @@ public class ControlPlayer : MonoBehaviour
     private void IsGrounded()
     {
         isGrounded  = Physics2D.Raycast(tf.position, -tf.up,groundDistance, 1 << LayerMask.NameToLayer("Ground"));
-        Debug.LogError("landed -> " + isGrounded);
         if (jumped && isGrounded)
         {
             if (isInAtk3)
             {
-                Debug.LogError("isInAtk3 -> " + isGrounded);
                 PlayAction(ActionAnim.AirAttack3_End,fadeAttack3);
+                speed = moveSpeed;
             }
             else
             {
                 attackReset = 0;
                 attackCompletionTime = 0;
             }
-            
+
             currentAttack = -1;
             jumped = false;
             isInAtk3 = false;
+            somersaulted = false;
         }
     }
 
