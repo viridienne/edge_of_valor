@@ -46,8 +46,9 @@ public class ControlCamera : MonoBehaviour
     private void LateUpdate()
     {
         if(_mainPlayer == null) return;
-        Vector3 playerPos = _mainPlayer.position;
-        Vector3 cameraPos = _cameraTransform.position;
+        var playerPos = _mainPlayer.position;
+        var cameraPos = _cameraTransform.position;
+        
         cameraPos.x = playerPos.x;
         cameraPos.y = playerPos.y;
         cameraPos.z = distance;
