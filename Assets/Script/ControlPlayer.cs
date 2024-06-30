@@ -27,6 +27,7 @@ public class ControlPlayer : MonoBehaviour
         ReceiveInput.Instance.JumpInput += Jump;
         ReceiveInput.Instance.LightAttackInput += LightAttack;
         ReceiveInput.Instance.HeavyAttackInput += HeavyAttack;
+        ControlCamera.Instance.SetMainPlayer(tf);
     }
 
     private void OnDestroy()
@@ -52,9 +53,28 @@ public class ControlPlayer : MonoBehaviour
             Flip();
             HandleAnimation();
         }
-        // Debug.Log("velocity -> " + rb.velocity);
     }
 
+    private void LateUpdate()
+    {
+        ClampPos();
+    }
+
+    private void ClampPos()
+    {
+        var mapController = MapManager.Instance.MapController;
+        var minX = mapController.MinX;
+        var maxX = mapController.MaxX;
+        var minY = mapController.MinY;
+        var maxY = mapController.MaxY;
+        if (tf.position.x > minX && tf.position.x < maxX && tf.position.y > minY && tf.position.y < maxY) return;
+        
+        var _pos = tf.position;
+        _pos.x = Mathf.Clamp(_pos.x, minX, maxX);
+        _pos.y = Mathf.Clamp(_pos.y, minY, maxY);
+        tf.position = _pos;
+        
+    }
     public void Countdown()
     {
         if(attackCompletionTime > 0)
