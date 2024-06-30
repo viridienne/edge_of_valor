@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// help create a dictionary full of beliefs
+/// </summary>
 public class BeliefFactory
 {
     private readonly GOAPAgent _agent;
@@ -24,6 +26,21 @@ public class BeliefFactory
         }
     }
 
+    
+    public void AddSensorBelief(EBelief type, Sensor sensor)
+    {
+        if (_beliefs.ContainsKey(type))
+        {
+            _beliefs[type] = new AgentBelief.Builder(type).WithCondition(sensor.IsTargetInRange)
+                .WithLocation(sensor.TargetPosition).Build();
+        }
+        else
+        {
+            _beliefs.Add(type,
+                new AgentBelief.Builder(type).WithCondition(sensor.IsTargetInRange).WithLocation(sensor.TargetPosition)
+                    .Build());
+        }
+    }
     public void AddLocationBelief(EBelief type, float distance, Vector3 location)
     {
         if (_beliefs.ContainsKey(type))
@@ -39,6 +56,12 @@ public class BeliefFactory
         }
     }
     
+    /// <summary>
+    /// calculate whether the target is in range, do the agent need to move? or close enough to attack?
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
     private bool IsInRange(Vector3 target, float range)
     {
         return Vector3.Distance(_agent.transform.position, target) <= range;
@@ -51,12 +74,18 @@ public class AgentBelief
     private bool _condition = false;
     public bool Condition => _condition;
 
-    private Vector3 _location;
+    private Vector3 _location; //where does the agent believe the target is
     public Vector3 Location => _location;
 
     public AgentBelief(EBelief type)
     {
         Type = type;
+    }
+    
+    public void Evaluate()
+    {
+        //evaluate the belief
+        _condition = true;
     }
 
     public class Builder
@@ -105,4 +134,9 @@ public enum EAction
     Idle,
     Dead,
     Jump,
+}
+
+public enum EGoal
+{
+    
 }
