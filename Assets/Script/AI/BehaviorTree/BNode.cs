@@ -9,38 +9,39 @@ public enum  BNodeState
 }
 public interface IBehavior
 {
+    public bool IsLoop { get;}
     public BNodeState Process();
     public void Reset();
 }
 
-public class RepeatedNode : BNode
+public class Condition : IBehavior
 {
-    protected readonly IBehavior Behavior;
-    public RepeatedNode(IBehavior behavior, string name = "RepeatedNode") : base(name)
+    protected readonly System.Func<bool> _condition;
+    public Condition(System.Func<bool> condition)
     {
-        Behavior = behavior;
+        _condition = condition;
     }
-    public override BNodeState Process()
+    public BNodeState Process()
     {
-        BNodeState = Behavior.Process();
-        if (BNodeState == BNodeState.SUCCESS)
-        {
-            Behavior.Reset();
-            BNodeState = BNodeState.RUNNING;
-        }
-        return BNodeState;
+        return _condition() ? BNodeState.SUCCESS : BNodeState.FAILURE;
+    }
+    public bool IsLoop => false;
+    public void Reset()
+    {
     }
 }
+
 public class BNode 
 {
     public BNodeState BNodeState { get; protected set; }
-    public List<BNode> Children { get; protected set; }
+    public List<BNode> Children { get; }
+    public string Name;
+    public int Priority;
     protected int _currentChild = 0;
-    protected string _name;
-    
-    public BNode(string name = "Node")
+    public BNode(string name = "Node" , int priority = 0)
     {
-        _name = name;
+        Name = name;
+        Priority = priority;
         BNodeState = BNodeState.RUNNING;
         Children = new List<BNode>();
     }

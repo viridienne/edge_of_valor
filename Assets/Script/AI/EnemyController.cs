@@ -1,21 +1,13 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
+using NodeExtension;
 using UnityEngine;
 
 public interface IEnemy
 {
     public void Spawn(Vector3 spawnPoint, List<Vector3> patrolPoints);
-    public void Idle();
-    public void Patrol();
-    public void Chase();
-    public void Attack();
     public void TakeDamage(float damage);
-    public void Die();
-    public void SetTarget(Transform target);
-    public void SetDestination(Vector3 destination);
-   public void SetConfig(EnemyConfig config);
-   public void Respawn();
+    public void SetConfig(EnemyConfig config);
+    public void Respawn();
 }
 
 public enum EnemyState
@@ -65,10 +57,12 @@ public class HandleEnemySpawn
         return Time.realtimeSinceStartup - LastDeathTime >= SpawnInterval;
     }
 }
+
 public class EnemyController : MonoBehaviour, IEnemy
 {
     [SerializeField] protected SpriteRenderer _spriteRenderer;
     [SerializeField] protected Animator _animator;
+    [SerializeField] protected BSensor _sensor;
     
     protected Vector3 _spawnPoint;
     protected List<Vector3> _patrolPoints;
@@ -78,6 +72,7 @@ public class EnemyController : MonoBehaviour, IEnemy
     protected EnemyConfig _config;
     protected EnemyStat _stat;
     protected HandleEnemySpawn _handleEnemySpawn;
+    
     public HandleEnemySpawn SpawnHandler => _handleEnemySpawn;
     public bool IsDead => _stat.IsDead;
     public virtual void Spawn(Vector3 spawnPoint, List<Vector3> patrolPoints)
@@ -86,28 +81,14 @@ public class EnemyController : MonoBehaviour, IEnemy
         _patrolPoints = patrolPoints;
         _transform = transform;
         _handleEnemySpawn.SetLastSpawnTime(Time.realtimeSinceStartup);
+        BuildBehaviorTree();
     }
 
-    public void Idle()
+    public virtual void BuildBehaviorTree()
     {
+        _behaviorTree = new BehaviorTree(_config.EnemyName);
     }
 
-    public void Patrol()
-    {
-        _behaviorTree.AddChild(new RepeatedNode(new PatrolBehavior(_transform, _spriteRenderer, _patrolPoints, _stat.Speed),
-            "Patrol"));
-        _state = EnemyState.Patrol;
-    }
-
-    public void Chase()
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void Attack()
-    {
-        throw new System.NotImplementedException();
-    }
 
     public void TakeDamage(float damage)
     {
@@ -118,16 +99,6 @@ public class EnemyController : MonoBehaviour, IEnemy
     {
        gameObject.SetActive(false);
        _state = EnemyState.Die;
-    }
-
-    public void SetTarget(Transform target)
-    {
-        throw new System.NotImplementedException();
-    }
-
-    public void SetDestination(Vector3 destination)
-    {
-        throw new System.NotImplementedException();
     }
 
     public void SetConfig(EnemyConfig config)
@@ -149,9 +120,7 @@ public class EnemyController : MonoBehaviour, IEnemy
 
     private void Update()
     {
-        if (_state == EnemyState.Patrol)
-        {
-            _behaviorTree.Process();
-        }
+        _behaviorTree.Process();
     }
 }
+

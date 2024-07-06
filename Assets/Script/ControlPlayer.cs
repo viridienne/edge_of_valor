@@ -15,11 +15,14 @@ public class ControlPlayer : MonoBehaviour
     private ActionAnim lastAction;
     private float speed;
     private Transform tf;
+    public Transform Tf => tf;
     private Vector2 moveInput;
     private float groundY;
-    private void Start()
+
+    private void Awake()
     {
         tf = transform;
+        GameManager.Instance.SetPlayer(this);
         rb = GetComponent<Rigidbody2D>();
         GetSpriteRenderer();
         currentAttack = 0;
@@ -29,6 +32,7 @@ public class ControlPlayer : MonoBehaviour
         ReceiveInput.Instance.HeavyAttackInput += HeavyAttack;
         ControlCamera.Instance.SetMainPlayer(tf);
     }
+
 
     private void OnDestroy()
     {

@@ -1,31 +1,14 @@
-﻿public class BehaviorTree : BNode
+﻿using UnityEngine;
+
+public class BehaviorTree : BNode
 {
     public BehaviorTree(string name = "BehaviorTree") : base(name)
     {
     }
     public override BNodeState Process()
     {
-        while (_currentChild < Children.Count)
-        {
-            BNodeState = Children[_currentChild].Process();
-            if (BNodeState == BNodeState.SUCCESS)
-            {
-                _currentChild++;
-            }
-            else
-            {
-                return BNodeState;
-            }
-               
-        }
-        return BNodeState.SUCCESS;
-    }
-    public override void Reset()
-    {
-        _currentChild = 0;
-        foreach (var child in Children)
-        {
-            child.Reset();
-        }
+        BNodeState = Children[_currentChild].Process();
+        _currentChild = (_currentChild + 1) % Children.Count;
+        return BNodeState.RUNNING;
     }
 }

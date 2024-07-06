@@ -20,6 +20,6 @@ MonoBehaviour:
   Damage: 15
   Health: 50
   RootPrefab: {fileID: 6651552299854482596, guid: 884e7169d52408847bac4bdc3627ceff, type: 3}
-  IsRespawnable: 0
-  SpawnInterval: 0
+  IsRespawnable: 1
+  SpawnInterval: 300
   CanPatrol: 1
