@@ -22,6 +22,12 @@ public class MapManager : MonoBehaviour
 
     private void Start()
     {
+        FindMapController();
+    }
+    
+    public void FindMapController()
+    {
         _mapController = FindObjectOfType<MapController>();
     }
+
 }
