@@ -176,7 +176,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 282893832}
-  - component: {fileID: 282893831}
+  - component: {fileID: 282893833}
   m_Layer: 0
   m_Name: DDOL
   m_TagString: Untagged
@@ -184,18 +184,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &282893831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 282893830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3fa4a400eae8fc04eb5f22d98d6dc0a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &282893832
 Transform:
   m_ObjectHideFlags: 0
@@ -211,10 +199,23 @@ Transform:
   m_Children:
   - {fileID: 1062472580}
   - {fileID: 519420032}
-  - {fileID: 685559412}
   - {fileID: 140124897}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &282893833
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 282893830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d42c0b4fc2062443bcca40ce9271cfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _ScriptableObjects:
+  - {fileID: 11400000, guid: 756e3328990ad6c4d889774f31296aa2, type: 2}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -366,6 +367,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   distance: -10
+  _playerSystem: {fileID: 11400000, guid: 9f9cc2571aeff494a8b72aea3d46a219, type: 2}
+  _mapControl: {fileID: 11400000, guid: b9bd1d59e7b37134db69267cb344eb81, type: 2}
 --- !u!1 &533614096
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,50 +621,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &685559411
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 685559412}
-  - component: {fileID: 685559413}
-  m_Layer: 0
-  m_Name: MapManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &685559412
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 685559411}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 282893832}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &685559413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 685559411}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7f7b29d6994c5f4e99c3c1cd7bf0780, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1062472579
 GameObject:
   m_ObjectHideFlags: 0
@@ -672,9 +631,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1062472580}
   - component: {fileID: 1062472581}
-  - component: {fileID: 1062472582}
   m_Layer: 0
-  m_Name: ReceiveInput
+  m_Name: Input Reader
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -722,9 +680,9 @@ MonoBehaviour:
   m_ActionEvents:
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1062472582}
-        m_TargetAssemblyTypeName: ReceiveInput, Assembly-CSharp
-        m_MethodName: Move
+      - m_Target: {fileID: 11400000, guid: 756e3328990ad6c4d889774f31296aa2, type: 2}
+        m_TargetAssemblyTypeName: InputReader, Assembly-CSharp
+        m_MethodName: OnMove
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -786,8 +744,8 @@ MonoBehaviour:
     m_ActionName: UI/TrackedDeviceOrientation
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1062472582}
-        m_TargetAssemblyTypeName: ReceiveInput, Assembly-CSharp
+      - m_Target: {fileID: 11400000, guid: 756e3328990ad6c4d889774f31296aa2, type: 2}
+        m_TargetAssemblyTypeName: InputReader, Assembly-CSharp
         m_MethodName: LightAttack
         m_Mode: 0
         m_Arguments:
@@ -802,8 +760,8 @@ MonoBehaviour:
     m_ActionName: Player/LightAtk[/Keyboard/j]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1062472582}
-        m_TargetAssemblyTypeName: ReceiveInput, Assembly-CSharp
+      - m_Target: {fileID: 11400000, guid: 756e3328990ad6c4d889774f31296aa2, type: 2}
+        m_TargetAssemblyTypeName: InputReader, Assembly-CSharp
         m_MethodName: Jump
         m_Mode: 0
         m_Arguments:
@@ -821,18 +779,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 519420031}
---- !u!114 &1062472582
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1062472579}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e275890d42381049bdf024766861ec4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1274851711
 GameObject:
   m_ObjectHideFlags: 0
@@ -932,6 +878,7 @@ GameObject:
   - component: {fileID: 1485192369}
   - component: {fileID: 1485192370}
   - component: {fileID: 1485192371}
+  - component: {fileID: 1485192372}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -1025,6 +972,8 @@ MonoBehaviour:
   groundDistance: 0.05
   controlAnimator: {fileID: 1485192371}
   rb: {fileID: 1485192369}
+  inputReader: {fileID: 11400000, guid: 756e3328990ad6c4d889774f31296aa2, type: 2}
+  playerSystem: {fileID: 11400000, guid: 9f9cc2571aeff494a8b72aea3d46a219, type: 2}
   somersaultForce: 450
   somersaultTime: 0.1
   somersaultLimit: 0.5
@@ -1137,6 +1086,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce26cffd8ec94084a8181ca589a27bbd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1485192372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1485192363}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91958e244dee484eb1982d6d4a8b31c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _mapControl: {fileID: 11400000, guid: b9bd1d59e7b37134db69267cb344eb81, type: 2}
 --- !u!1 &1526884861
 GameObject:
   m_ObjectHideFlags: 0
@@ -1349,6 +1311,7 @@ MonoBehaviour:
   _maxX: 8.17
   _minY: -4.17
   _maxY: 4
+  _mapControl: {fileID: 11400000, guid: b9bd1d59e7b37134db69267cb344eb81, type: 2}
 --- !u!4 &1991564184
 Transform:
   m_ObjectHideFlags: 0

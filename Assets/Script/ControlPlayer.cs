@@ -1,4 +1,3 @@
-using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -11,7 +10,9 @@ public class ControlPlayer : MonoBehaviour
     [SerializeField] private float groundDistance = 0.2f;
     [SerializeField] private ControlAnimatorV2 controlAnimator;
     [SerializeField] private Rigidbody2D rb;
-
+    [SerializeField] private InputReader inputReader;
+    [SerializeField] private PlayerSystem playerSystem;
+    
     private ActionAnim lastAction;
     private float speed;
     private Transform tf;
@@ -27,18 +28,28 @@ public class ControlPlayer : MonoBehaviour
         GetSpriteRenderer();
         currentAttack = 0;
         speed = moveSpeed;
-        ReceiveInput.Instance.JumpInput += Jump;
-        ReceiveInput.Instance.LightAttackInput += LightAttack;
-        ReceiveInput.Instance.HeavyAttackInput += HeavyAttack;
-        ControlCamera.Instance.SetMainPlayer(tf);
+        RegisterInput();
+        playerSystem.RegisterPlayer(tf);
     }
 
+    private void RegisterInput()
+    {
+        inputReader.JumpEvent += Jump;
+        inputReader.LightAttackEvent += LightAttack;
+        inputReader.HeavyAttackEvent += HeavyAttack;
+        inputReader.MoveEvent += Move;
+    }
 
+    private void UnregisterInput()
+    {
+        inputReader.JumpEvent -= Jump;
+        inputReader.LightAttackEvent -= LightAttack;
+        inputReader.HeavyAttackEvent -= HeavyAttack;
+        inputReader.MoveEvent -= Move;
+    }
     private void OnDestroy()
     {
-        ReceiveInput.Instance.JumpInput -= Jump;
-        ReceiveInput.Instance.LightAttackInput -= LightAttack;
-        ReceiveInput.Instance.HeavyAttackInput -= HeavyAttack;
+        UnregisterInput();
     }
 
     private void FixedUpdate()
@@ -48,7 +59,6 @@ public class ControlPlayer : MonoBehaviour
 
     private void Update()
     {
-        moveInput = ReceiveInput.Instance.MoveInput;
         Countdown();
 
         if(attackReset <= 0f)
@@ -59,26 +69,6 @@ public class ControlPlayer : MonoBehaviour
         }
     }
 
-    private void LateUpdate()
-    {
-        ClampPos();
-    }
-
-    private void ClampPos()
-    {
-        var mapController = MapManager.Instance.MapController;
-        var minX = mapController.MinX;
-        var maxX = mapController.MaxX;
-        var minY = mapController.MinY;
-        var maxY = mapController.MaxY;
-        if (tf.position.x > minX && tf.position.x < maxX && tf.position.y > minY && tf.position.y < maxY) return;
-        
-        var _pos = tf.position;
-        _pos.x = Mathf.Clamp(_pos.x, minX, maxX);
-        _pos.y = Mathf.Clamp(_pos.y, minY, maxY);
-        tf.position = _pos;
-        
-    }
     public void Countdown()
     {
         if(attackCompletionTime > 0)
@@ -139,6 +129,11 @@ public class ControlPlayer : MonoBehaviour
         }
     }
     
+    private void Move(Vector2 _moveInput)
+    {
+        moveInput = _moveInput;
+    }
+
     private void Move()
     {
         var _current = tf.position;

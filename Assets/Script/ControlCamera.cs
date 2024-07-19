@@ -4,43 +4,28 @@ using UnityEngine;
 
 public class ControlCamera : MonoBehaviour
 {
-    public static ControlCamera Instance;
-    private  static ControlCamera _instance;
     [SerializeField] private float distance = -10f;
     [ShowInInspector] private Camera _camera;
-    private Transform _mainPlayer;
+    [SerializeField] private PlayerSystem _playerSystem;
+    [SerializeField] private MapControl _mapControl;
+    private Transform _mainPlayer => _playerSystem.PlayerTransform;
     private Transform _cameraTransform;
     
     private float _orthoSize => _camera.orthographicSize;
     private float _camHeight => _orthoSize * 2;
     private float _camWidth => _camHeight * _camera.aspect;
-    private float _clampMinX => MapManager.Instance.MapController.MinX;
-    private float _clampMaxX => MapManager.Instance.MapController.MaxX;
+    private float _clampMinX => _mapControl.MinX;
+    private float _clampMaxX => _mapControl.MaxX;
 
-    private float _clampMinY => MapManager.Instance.MapController.MinY;
-    
-    private float _clampMaxY => MapManager.Instance.MapController.MaxY;
+    private float _clampMinY => _mapControl.MinY;
+
+    private float _clampMaxY => _mapControl.MaxY;
     
     
     private void Awake()
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            Instance = _instance;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-        
         _camera = Camera.main;
         if (_camera != null) _cameraTransform = _camera.transform;
-    }
-    
-    public void SetMainPlayer(Transform player)
-    {
-        _mainPlayer = player;
     }
     
     private void LateUpdate()
